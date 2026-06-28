@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JLPT N2 Flashcards</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1a2e;
+    --paper: #f5f0e8;
+    --paper-dark: #ede6d6;
+    --vermillion: #c0392b;
+    --vermillion-light: #e74c3c;
+    --gold: #c9a84c;
+    --muted: #6b6b80;
+    --card-bg: #faf7f2;
+    --shadow: rgba(26,26,46,0.18);
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--ink);
+    color: var(--paper);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* --- Header --- */
+  header {
+    width: 100%;
+    padding: 24px 32px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+  }
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .logo-badge {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--vermillion);
+    background: rgba(192,57,43,0.12);
+    border: 1px solid rgba(192,57,43,0.3);
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+  .logo-title {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--paper);
+    opacity: 0.9;
+  }
+  .header-stats {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gold);
+    display: block;
+  }
+  .stat-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* --- Controls --- */
+  .controls {
+    width: 100%;
+    max-width: 780px;
+    padding: 28px 16px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lesson-select {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--paper);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .lesson-select:hover, .lesson-select:focus {
+    border-color: var(--gold);
+  }
+  .lesson-select option { background: #1a1a2e; }
+
+  .mode-toggle {
+    display: flex;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .mode-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .mode-btn.active {
+    background: var(--vermillion);
+    color: #fff;
+  }
+
+  .btn {
+    padding: 8px 18px;
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+    color: var(--paper);
+    transition: all 0.2s;
+  }
+  .btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); }
+  .btn.primary { background: var(--vermillion); border-color: var(--vermillion); }
+  .btn.primary:hover { background: var(--vermillion-light); }
+
+  /* --- Progress bar --- */
+  .progress-wrap {
+    width: 100%;
+    max-width: 780px;
+    padding: 4px 16px 16px;
+  }
+  .progress-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--vermillion), var(--gold));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-text {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    margin-top: 5px;
+    letter-spacing: 0.05em;
+  }
+
+  /* --- Card area --- */
+  .card-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 16px 32px;
+    width: 100%;
+  }
+
+  .card-scene {
+    width: 100%;
+    max-width: 560px;
+    height: 340px;
+    perspective: 1000px;
+    cursor: pointer;
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    background: var(--card-bg);
+    border-radius: 16px;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    box-shadow: 0 8px 40px var(--shadow), 0 2px 8px rgba(0,0,0,0.12);
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .card-back {
+    transform: rotateY(180deg);
+    background: #fefcf7;
+  }
+
+  /* Front face */
+  .card-face-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+  }
+
+  .kanji-display {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 72px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+    text-align: center;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+
+  .pos-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-family: 'Inter', sans-serif;
+    color: var(--vermillion);
+    background: rgba(192,57,43,0.08);
+    border: 1px solid rgba(192,57,43,0.2);
+    border-radius: 3px;
+    padding: 2px 8px;
+    letter-spacing: 0.06em;
+  }
+
+  .flip-hint {
+    position: absolute;
+    bottom: 14px;
+    font-size: 10px;
+    color: rgba(100,100,120,0.5);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.08em;
+  }
+
+  /* Back face */
+  .reading-display {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--vermillion);
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  .english-display {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--ink);
+    text-align: center;
+    line-height: 1.6;
+    max-width: 380px;
+    opacity: 0.85;
+  }
+
+  .kanji-small {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  /* No kanji case */
+  .kana-only-display {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+    text-align: center;
+  }
+
+  /* --- Navigation buttons --- */
+  .nav-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .nav-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+    color: var(--paper);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.14); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  .flip-btn {
+    padding: 14px 36px;
+    border-radius: 28px;
+    border: none;
+    background: var(--vermillion);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(192,57,43,0.35);
+  }
+  .flip-btn:hover { background: var(--vermillion-light); transform: translateY(-1px); }
+
+  /* --- Self-check row --- */
+  .check-row {
+    display: none;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .check-row.visible { display: flex; }
+
+  .check-btn {
+    padding: 9px 22px;
+    border-radius: 6px;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .check-btn.wrong { background: rgba(192,57,43,0.15); color: var(--vermillion-light); border: 1px solid rgba(192,57,43,0.3); }
+  .check-btn.right { background: rgba(39,174,96,0.15); color: #2ecc71; border: 1px solid rgba(39,174,96,0.3); }
+  .check-btn:hover { transform: translateY(-1px); }
+
+  /* --- Empty / loading state --- */
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    padding: 60px 16px;
+  }
+  .empty-state .big { font-size: 48px; margin-bottom: 12px; }
+
+  /* --- Lesson selector pills --- */
+  .lesson-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    justify-content: center;
+    max-width: 780px;
+    padding: 0 16px 8px;
+  }
+  .pill {
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--muted);
+  }
+  .pill:hover { border-color: rgba(255,255,255,0.25); color: var(--paper); }
+  .pill.active { background: var(--gold); border-color: var(--gold); color: var(--ink); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .kanji-display { font-size: 54px; }
+    .card-scene { height: 300px; }
+    .header-stats { display: none; }
+    header { padding: 16px 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-badge">N2</span>
+    <span class="logo-title">日本語フラッシュカード</span>
+  </div>
+  <div class="header-stats">
+    <div class="stat">
+      <span class="stat-num" id="total-count">0</span>
+      <span class="stat-label">Cards</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" id="correct-count" style="color:#2ecc71">0</span>
+      <span class="stat-label">Correct</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" id="wrong-count" style="color:#e74c3c">0</span>
+      <span class="stat-label">Wrong</span>
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="mode-kanji" onclick="setMode('kanji')">漢字 → Reading</button>
+    <button class="mode-btn" id="mode-english" onclick="setMode('english')">漢字 → English</button>
+    <button class="mode-btn" id="mode-reading" onclick="setMode('reading')">Reading → English</button>
+  </div>
+  <button class="btn primary" onclick="shuffleDeck()">🔀 Shuffle</button>
+  <button class="btn" onclick="resetStats()">↺ Reset</button>
+</div>
+
+<div class="lesson-pills" id="lesson-pills"></div>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="progress-text" id="progress-text">0 / 0</div>
+</div>
+
+<div class="card-area">
+  <div class="card-scene" onclick="flipCard()">
+    <div class="card" id="card">
+      <div class="card-face">
+        <div class="card-face-label">FRONT</div>
+        <div class="kanji-display" id="front-kanji">漢字</div>
+        <div class="pos-tag" id="front-pos">n.</div>
+        <div class="flip-hint">tap to reveal</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="kanji-small" id="back-kanji-small"></div>
+        <div class="reading-display" id="back-reading">ひらがな</div>
+        <div class="english-display" id="back-english">English meaning</div>
+        <div class="flip-hint">tap to flip back</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="nav-btn" id="prev-btn" onclick="prevCard()">←</button>
+    <button class="flip-btn" onclick="flipCard()" id="flip-btn-main">Reveal</button>
+    <button class="nav-btn" id="next-btn" onclick="nextCard()">→</button>
+  </div>
+
+  <div class="check-row" id="check-row">
+    <button class="check-btn wrong" onclick="markCard(false)">✗ Didn't know</button>
+    <button class="check-btn right" onclick="markCard(true)">✓ Got it!</button>
+  </div>
+</div>
+
+<script>
+// ====== VOCABULARY DATA ======
+const vocab = [
+  // Lesson 1
+  { kanji:"得る", reading:"える", english:"to get / to gain / to understand", pos:"vt.", lesson:1 },
+  { kanji:"同窓会", reading:"どうそうかい", english:"class reunion", pos:"n.", lesson:1 },
+  { kanji:"同級生", reading:"どうきゅうせい", english:"classmate / schoolmate in the same grade", pos:"n.", lesson:1 },
+  { kanji:"職業", reading:"しょくぎょう", english:"occupation", pos:"n.", lesson:1 },
+  { kanji:"就職先", reading:"しゅうしょくさき", english:"place of employment", pos:"n.", lesson:1 },
+  { kanji:"就職率", reading:"しゅうしょくりつ", english:"the rate of employment", pos:"n.", lesson:1 },
+  { kanji:"就職難", reading:"しゅうしょくなん", english:"difficulty in finding employment", pos:"n.", lesson:1 },
+  { kanji:"魅力", reading:"みりょく", english:"attraction / charm / appeal", pos:"n.", lesson:1 },
+  { kanji:"簡単", reading:"かんたん", english:"easy / simple / ease", pos:"な-adj./n.", lesson:1 },
+  { kanji:"特集", reading:"とくしゅう", english:"special edition / feature / to feature", pos:"n./vt.", lesson:1 },
+  { kanji:"見出し", reading:"みだし", english:"headline", pos:"n.", lesson:1 },
+  { kanji:"相当", reading:"そうとう", english:"worth / equivalent to / quite", pos:"n./vi.", lesson:1 },
+  { kanji:"女優", reading:"じょゆう", english:"actress", pos:"n.", lesson:1 },
+  { kanji:"俳優", reading:"はいゆう", english:"actor", pos:"n.", lesson:1 },
+  { kanji:"出演者", reading:"しゅつえんしゃ", english:"the cast / performer", pos:"n.", lesson:1 },
+  { kanji:"著名人", reading:"ちょめいじん", english:"celebrity", pos:"n.", lesson:1 },
+  { kanji:"取材", reading:"しゅざい", english:"news coverage / to collect data / to interview", pos:"n./vi.", lesson:1 },
+  { kanji:"記者", reading:"きしゃ", english:"journalist / reporter", pos:"n.", lesson:1 },
+  { kanji:"業界", reading:"ぎょうかい", english:"the industry / the trade", pos:"n.", lesson:1 },
+  { kanji:"業績", reading:"ぎょうせき", english:"achievements or results in business or academic research", pos:"n.", lesson:1 },
+  { kanji:"身につける", reading:"みにつける", english:"to wear / to put on / to acquire", pos:"vt.", lesson:1 },
+  { kanji:"状況", reading:"じょうきょう", english:"situation / circumstances / the state of affairs", pos:"n.", lesson:1 },
+  { kanji:"暮らす", reading:"くらす", english:"to live / to make one's living", pos:"vi./vt.", lesson:1 },
+  { kanji:"品質", reading:"ひんしつ", english:"quality", pos:"n.", lesson:1 },
+  { kanji:"受け入れる", reading:"うけいれる", english:"to accept / to receive", pos:"vt.", lesson:1 },
+  { kanji:"苦情", reading:"くじょう", english:"complaint / grievance", pos:"n.", lesson:1 },
+  { kanji:"全力", reading:"ぜんりょく", english:"all one's strength / all one's energy", pos:"n.", lesson:1 },
+  { kanji:"講座", reading:"こうざ", english:"lecture / course", pos:"n.", lesson:1 },
+  { kanji:"講師", reading:"こうし", english:"teacher / lecturer / speaker", pos:"n.", lesson:1 },
+  { kanji:"頼もしい", reading:"たのもしい", english:"reliable / promising", pos:"い-adj.", lesson:1 },
+  { kanji:"頼る", reading:"たよる", english:"to rely / to depend", pos:"vi./vt.", lesson:1 },
+  { kanji:"気合", reading:"きあい", english:"spirit / guts / energy and concentration", pos:"n.", lesson:1 },
+  { kanji:"本番", reading:"ほんばん", english:"performance / real stage (not rehearsal)", pos:"n.", lesson:1 },
+  { kanji:"散々", reading:"さんざん", english:"terrible / awful / severely / mercilessly", pos:"な-adj./adv.", lesson:1 },
+  { kanji:"生かす", reading:"いかす", english:"to bring to life / to make use of", pos:"vt.", lesson:1 },
+  { kanji:"宇宙", reading:"うちゅう", english:"the universe / space / the cosmos", pos:"n.", lesson:1 },
+  { kanji:"宇宙船", reading:"うちゅうせん", english:"spacecraft / spaceship", pos:"n.", lesson:1 },
+  { kanji:"大雑把", reading:"おおざっぱ", english:"rough / crude / sketchy", pos:"な-adj.", lesson:1 },
+  { kanji:"食料", reading:"しょくりょう", english:"food", pos:"n.", lesson:1 },
+  { kanji:"母校", reading:"ぼこう", english:"one's alma mater", pos:"n.", lesson:1 },
+  { kanji:"期日", reading:"きじつ", english:"due date / fixed date / expiration date", pos:"n.", lesson:1 },
+  { kanji:"生涯", reading:"しょうがい", english:"life / lifetime", pos:"n.", lesson:1 },
+  { kanji:"欠航", reading:"けっこう", english:"cancellation of a flight or a sailing", pos:"n./vi.", lesson:1 },
+  { kanji:"幹事", reading:"かんじ", english:"organizer of a social gathering", pos:"n.", lesson:1 },
+  { kanji:"上旬", reading:"じょうじゅん", english:"the first ten days of a month", pos:"n.", lesson:1 },
+  { kanji:"下旬", reading:"げじゅん", english:"the last ten days of a month", pos:"n.", lesson:1 },
+  { kanji:"積極的", reading:"せっきょくてき", english:"proactive / positive / aggressive", pos:"な-adj.", lesson:1 },
+  { kanji:"消極的", reading:"しょうきょくてき", english:"unmotivated / passive / negative", pos:"な-adj.", lesson:1 },
+  { kanji:"旧友", reading:"きゅうゆう", english:"old friend", pos:"n.", lesson:1 },
+  { kanji:"予測", reading:"よそく", english:"prediction / to predict / to forecast", pos:"n./vt.", lesson:1 },
+  { kanji:"意思", reading:"いし", english:"will / volition / determination", pos:"n.", lesson:1 },
+  { kanji:"破る", reading:"やぶる", english:"to break / to tear / to rip / to violate", pos:"vt.", lesson:1 },
+  { kanji:"測る", reading:"はかる", english:"to measure / to estimate", pos:"vt.", lesson:1 },
+  { kanji:"利益", reading:"りえき", english:"profit", pos:"n.", lesson:1 },
+  // Lesson 2
+  { kanji:"証拠", reading:"しょうこ", english:"evidence", pos:"n.", lesson:2 },
+  { kanji:"掴む", reading:"つかむ", english:"to catch / to seize / to grip", pos:"vt.", lesson:2 },
+  { kanji:"容疑者", reading:"ようぎしゃ", english:"suspect / person under suspicion", pos:"n.", lesson:2 },
+  { kanji:"逮捕", reading:"たいほ", english:"arrest / to arrest", pos:"n./vt.", lesson:2 },
+  { kanji:"駐輪場", reading:"ちゅうりんじょう", english:"parking lot for bicycles", pos:"n.", lesson:2 },
+  { kanji:"順調", reading:"じゅんちょう", english:"favorable / satisfactory / smooth", pos:"な-adj.", lesson:2 },
+  { kanji:"違反", reading:"いはん", english:"violation / to violate", pos:"n./vi.", lesson:2 },
+  { kanji:"許可", reading:"きょか", english:"permission / to permit / to allow", pos:"n./vt.", lesson:2 },
+  { kanji:"節約", reading:"せつやく", english:"saving / to save (time, money)", pos:"n./vt.", lesson:2 },
+  { kanji:"有効", reading:"ゆうこう", english:"valid / effective", pos:"n./な-adj.", lesson:2 },
+  { kanji:"無効", reading:"むこう", english:"invalid / ineffective", pos:"n./な-adj.", lesson:2 },
+  { kanji:"上品", reading:"じょうひん", english:"elegant / refined / sophisticated", pos:"な-adj.", lesson:2 },
+  { kanji:"下品", reading:"げひん", english:"vulgar", pos:"な-adj.", lesson:2 },
+  { kanji:"罰金", reading:"ばっきん", english:"fine / penalty", pos:"n.", lesson:2 },
+  { kanji:"服装", reading:"ふくそう", english:"clothes / the style of dress", pos:"n.", lesson:2 },
+  { kanji:"責任", reading:"せきにん", english:"responsibility", pos:"n.", lesson:2 },
+  { kanji:"外交官", reading:"がいこうかん", english:"diplomat", pos:"n.", lesson:2 },
+  { kanji:"豪華", reading:"ごうか", english:"luxurious / gorgeous", pos:"な-adj.", lesson:2 },
+  { kanji:"厳重", reading:"げんじゅう", english:"severe / strict", pos:"な-adj.", lesson:2 },
+  { kanji:"効率", reading:"こうりつ", english:"efficiency", pos:"n.", lesson:2 },
+  { kanji:"契約", reading:"けいやく", english:"contract / agreement", pos:"n.", lesson:2 },
+  { kanji:"関わる", reading:"かかわる", english:"to be affected / to be involved / to be concerned with", pos:"vi.", lesson:2 },
+  { kanji:"市場", reading:"しじょう", english:"market", pos:"n.", lesson:2 },
+  { kanji:"進出", reading:"しんしゅつ", english:"advance / to advance / to go into", pos:"n./vi.", lesson:2 },
+  { kanji:"了承", reading:"りょうしょう", english:"agreement / permission / to approve", pos:"n./vt.", lesson:2 },
+  { kanji:"単位", reading:"たんい", english:"unit / academic credit", pos:"n.", lesson:2 },
+  { kanji:"区別", reading:"くべつ", english:"distinction / to distinguish", pos:"n./vt.", lesson:2 },
+  { kanji:"放置", reading:"ほうち", english:"neglect / to leave something as it is", pos:"n./vt.", lesson:2 },
+  { kanji:"防止", reading:"ぼうし", english:"prevention / to prevent", pos:"n./vt.", lesson:2 },
+  { kanji:"破損", reading:"はそん", english:"damage / to be damaged / to damage", pos:"n./vi./vt.", lesson:2 },
+  { kanji:"窓口", reading:"まどぐち", english:"help desk / point of contact / service counter", pos:"n.", lesson:2 },
+  { kanji:"器用", reading:"きよう", english:"skilled / handy / good with hands", pos:"な-adj.", lesson:2 },
+  { kanji:"強引", reading:"ごういん", english:"overbearing / pushy / forcible", pos:"な-adj.", lesson:2 },
+  { kanji:"陽気", reading:"ようき", english:"cheerful / merry", pos:"な-adj.", lesson:2 },
+  { kanji:"明確", reading:"めいかく", english:"clear / precise", pos:"な-adj.", lesson:2 },
+  { kanji:"手がかり", reading:"てがかり", english:"clue", pos:"n.", lesson:2 },
+  // Lesson 3
+  { kanji:"停電", reading:"ていでん", english:"power outage / blackout", pos:"n./vi.", lesson:3 },
+  { kanji:"断水", reading:"だんすい", english:"water outage / to cut off the water supply", pos:"n./vi.", lesson:3 },
+  { kanji:"部署", reading:"ぶしょ", english:"one's post / department / section", pos:"n.", lesson:3 },
+  { kanji:"手順", reading:"てじゅん", english:"procedure", pos:"n.", lesson:3 },
+  { kanji:"従う", reading:"したがう", english:"to follow / to obey / to abide by a rule", pos:"vi.", lesson:3 },
+  { kanji:"流出", reading:"りゅうしゅつ", english:"outflow / to leak out", pos:"n./vi.", lesson:3 },
+  { kanji:"情報管理", reading:"じょうほうかんり", english:"information management", pos:"n.", lesson:3 },
+  { kanji:"方針", reading:"ほうしん", english:"policy", pos:"n.", lesson:3 },
+  { kanji:"終了", reading:"しゅうりょう", english:"end / close / to finish / to end", pos:"n./vt./vi.", lesson:3 },
+  { kanji:"離婚", reading:"りこん", english:"divorce / to get divorced", pos:"n./vi.", lesson:3 },
+  { kanji:"決意", reading:"けつい", english:"determination / to decide", pos:"n./vt.", lesson:3 },
+  { kanji:"汚染", reading:"おせん", english:"pollution / contamination / to pollute", pos:"n./vt.", lesson:3 },
+  { kanji:"海洋", reading:"かいよう", english:"ocean", pos:"n.", lesson:3 },
+  { kanji:"大気汚染", reading:"たいきおせん", english:"air pollution", pos:"n.", lesson:3 },
+  { kanji:"海洋汚染", reading:"かいようおせん", english:"marine pollution", pos:"n.", lesson:3 },
+  { kanji:"仲介", reading:"ちゅうかい", english:"mediation / to mediate", pos:"n./vt.", lesson:3 },
+  { kanji:"調節", reading:"ちょうせつ", english:"adjustment / regulation / to adjust", pos:"n./vt.", lesson:3 },
+  { kanji:"休業", reading:"きゅうぎょう", english:"closing a business / to close a business", pos:"n./vi.", lesson:3 },
+  { kanji:"指示", reading:"しじ", english:"instructions / to instruct / to direct", pos:"n./vt.", lesson:3 },
+  { kanji:"避難", reading:"ひなん", english:"evacuation / refuge / to take refuge", pos:"n./vi.", lesson:3 },
+  { kanji:"豊か", reading:"ゆたか", english:"abundant / rich", pos:"な-adj.", lesson:3 },
+  { kanji:"豊富", reading:"ほうふ", english:"wealth / plenty / rich / abundant", pos:"n./な-adj.", lesson:3 },
+  { kanji:"才能", reading:"さいのう", english:"talent", pos:"n.", lesson:3 },
+  { kanji:"採用", reading:"さいよう", english:"adoption / employment / to employ / to use", pos:"n./vt.", lesson:3 },
+  { kanji:"点検", reading:"てんけん", english:"inspection / to inspect / to examine", pos:"n./vt.", lesson:3 },
+  { kanji:"精密機械", reading:"せいみつきかい", english:"precision machine", pos:"n.", lesson:3 },
+  { kanji:"規則", reading:"きそく", english:"rules / regulations", pos:"n.", lesson:3 },
+  { kanji:"質", reading:"しつ", english:"quality", pos:"n.", lesson:3 },
+  { kanji:"処理", reading:"しょり", english:"processing / dealing / to deal with", pos:"n./vt.", lesson:3 },
+  { kanji:"承る", reading:"うけたまわる", english:"to hear / to receive a command / to take an order", pos:"vt.", lesson:3 },
+  { kanji:"急速", reading:"きゅうそく", english:"rapid", pos:"n./な-adj.", lesson:3 },
+  { kanji:"短気", reading:"たんき", english:"short temper / impatience / short-tempered", pos:"n./な-adj.", lesson:3 },
+  { kanji:"店舗", reading:"てんぽ", english:"shop / store", pos:"n.", lesson:3 },
+  { kanji:"開設", reading:"かいせつ", english:"establishment / opening / to open / to set up", pos:"n./vt.", lesson:3 },
+  { kanji:"倒産", reading:"とうさん", english:"bankruptcy / to be bankrupt", pos:"n./vi.", lesson:3 },
+  { kanji:"制度", reading:"せいど", english:"system / institution", pos:"n.", lesson:3 },
+  { kanji:"経費", reading:"けいひ", english:"expense / cost / expenditure", pos:"n.", lesson:3 },
+  // Lesson 4
+  { kanji:"定員", reading:"ていいん", english:"capacity / quota", pos:"n.", lesson:4 },
+  { kanji:"締め切る", reading:"しめきる", english:"to close", pos:"vt.", lesson:4 },
+  { kanji:"締め切り", reading:"しめきり", english:"deadline / closing date", pos:"n.", lesson:4 },
+  { kanji:"問い合わせ", reading:"といあわせ", english:"inquiry", pos:"n.", lesson:4 },
+  { kanji:"年度", reading:"ねんど", english:"fiscal year / academic year", pos:"n.", lesson:4 },
+  { kanji:"展開", reading:"てんかい", english:"development / unfolding / to develop", pos:"n./vi./vt.", lesson:4 },
+  { kanji:"契機", reading:"けいき", english:"chance / opportunity", pos:"n.", lesson:4 },
+  { kanji:"慎重", reading:"しんちょう", english:"careful / cautious / prudent", pos:"な-adj./n.", lesson:4 },
+  { kanji:"義務", reading:"ぎむ", english:"obligation / duty", pos:"n.", lesson:4 },
+  { kanji:"義務教育", reading:"ぎむきょういく", english:"compulsory education", pos:"n.", lesson:4 },
+  { kanji:"配慮", reading:"はいりょ", english:"consideration / care / to consider", pos:"n./vt.", lesson:4 },
+  { kanji:"原則", reading:"げんそく", english:"principle", pos:"n.", lesson:4 },
+  { kanji:"免除", reading:"めんじょ", english:"exemption / to exempt", pos:"n./vt.", lesson:4 },
+  { kanji:"震災", reading:"しんさい", english:"earthquake disaster", pos:"n.", lesson:4 },
+  { kanji:"援助", reading:"えんじょ", english:"aid / help / to aid / to help", pos:"n./vt.", lesson:4 },
+  { kanji:"救助", reading:"きゅうじょ", english:"rescue / to rescue", pos:"n./vt.", lesson:4 },
+  { kanji:"正義", reading:"せいぎ", english:"justice", pos:"n.", lesson:4 },
+  { kanji:"罪", reading:"つみ", english:"crime / guilt / sin", pos:"n.", lesson:4 },
+  { kanji:"奪う", reading:"うばう", english:"to rob / to snatch / to take something away", pos:"vt.", lesson:4 },
+  { kanji:"独立", reading:"どくりつ", english:"independence / to be independent", pos:"n./vi.", lesson:4 },
+  { kanji:"繰り返す", reading:"くりかえす", english:"to repeat", pos:"vt.", lesson:4 },
+  { kanji:"改良", reading:"かいりょう", english:"improvement / to improve", pos:"n./vt.", lesson:4 },
+  { kanji:"有無", reading:"うむ", english:"existence or non-existence / yes or no", pos:"n.", lesson:4 },
+  { kanji:"性別", reading:"せいべつ", english:"sex / gender", pos:"n.", lesson:4 },
+  { kanji:"国籍", reading:"こくせき", english:"nationality / citizenship", pos:"n.", lesson:4 },
+  { kanji:"対策", reading:"たいさく", english:"measure / countermeasure", pos:"n.", lesson:4 },
+  { kanji:"強化", reading:"きょうか", english:"reinforcement / to reinforce / to strengthen", pos:"n./vt.", lesson:4 },
+  { kanji:"実施", reading:"じっし", english:"implementation / to implement / to put into effect", pos:"n./vt.", lesson:4 },
+  { kanji:"掲示板", reading:"けいじばん", english:"bulletin board / notice board", pos:"n.", lesson:4 },
+  { kanji:"詳しい", reading:"くわしい", english:"detailed / knowing something well", pos:"い-adj.", lesson:4 },
+  { kanji:"宿泊", reading:"しゅくはく", english:"lodging / to stay / to lodge", pos:"n./vi.", lesson:4 },
+  { kanji:"職場", reading:"しょくば", english:"workplace / office", pos:"n.", lesson:4 },
+  { kanji:"書き取り", reading:"かきとり", english:"dictation / spelling out", pos:"n.", lesson:4 },
+  { kanji:"乱れる", reading:"みだれる", english:"to fall into disorder / to be chaotic", pos:"vi.", lesson:4 },
+  { kanji:"受賞", reading:"じゅしょう", english:"being awarded / to win a prize", pos:"n./vt.", lesson:4 },
+  { kanji:"運行", reading:"うんこう", english:"service / to be in operation (bus, train)", pos:"n./vi.", lesson:4 },
+  { kanji:"忠誠", reading:"ちゅうせい", english:"loyalty", pos:"n.", lesson:4 },
+  { kanji:"掲載", reading:"けいさい", english:"to publish / to print / to carry the news", pos:"n./vt.", lesson:4 },
+  // Lesson 5
+  { kanji:"至急", reading:"しきゅう", english:"urgency / urgently / as soon as possible", pos:"n./adv.", lesson:5 },
+  { kanji:"早退", reading:"そうたい", english:"leaving early / to leave work or school early", pos:"n./vi.", lesson:5 },
+  { kanji:"詳細", reading:"しょうさい", english:"details", pos:"n.", lesson:5 },
+  { kanji:"被災地", reading:"ひさいち", english:"disaster-stricken area", pos:"n.", lesson:5 },
+  { kanji:"復興", reading:"ふっこう", english:"revival / to be revived / to revive", pos:"n./vi./vt.", lesson:5 },
+  { kanji:"適切", reading:"てきせつ", english:"adequate / proper / appropriate / suitable", pos:"な-adj.", lesson:5 },
+  { kanji:"需要", reading:"じゅよう", english:"demand", pos:"n.", lesson:5 },
+  { kanji:"要望", reading:"ようぼう", english:"request / demand / to demand", pos:"n./vt.", lesson:5 },
+  { kanji:"記者会見", reading:"きしゃかいけん", english:"press conference", pos:"n.", lesson:5 },
+  { kanji:"厳守", reading:"げんしゅ", english:"strict observance / to observe strictly", pos:"n./vi.", lesson:5 },
+  { kanji:"期限", reading:"きげん", english:"certain period of time / time limit / deadline", pos:"n.", lesson:5 },
+  { kanji:"程度", reading:"ていど", english:"degree / extent / level / about", pos:"n./suffix", lesson:5 },
+  { kanji:"研修", reading:"けんしゅう", english:"training / to train / to study", pos:"n./vt.", lesson:5 },
+  { kanji:"緊急", reading:"きんきゅう", english:"emergency / urgent", pos:"n./な-adj.", lesson:5 },
+  { kanji:"郵送", reading:"ゆうそう", english:"mailing / to mail", pos:"n./vt.", lesson:5 },
+  { kanji:"承知", reading:"しょうち", english:"consent / agreement / acknowledgement / to understand", pos:"n./vt.", lesson:5 },
+  { kanji:"導入", reading:"どうにゅう", english:"introduction / to introduce", pos:"n./vt.", lesson:5 },
+  { kanji:"基準", reading:"きじゅん", english:"standard / yardstick", pos:"n.", lesson:5 },
+  { kanji:"提示", reading:"ていじ", english:"presentation / to present / to indicate", pos:"n./vt.", lesson:5 },
+  { kanji:"法人", reading:"ほうじん", english:"corporation / legal entity", pos:"n.", lesson:5 },
+  { kanji:"個人", reading:"こじん", english:"individual", pos:"n.", lesson:5 },
+  { kanji:"交渉", reading:"こうしょう", english:"negotiation / relation / to negotiate", pos:"n./vt.", lesson:5 },
+  { kanji:"省く", reading:"はぶく", english:"to omit / to save / to remove", pos:"vt.", lesson:5 },
+  { kanji:"妥当", reading:"だとう", english:"proper / appropriate / adequate", pos:"な-adj.", lesson:5 },
+  { kanji:"清潔", reading:"せいけつ", english:"clean", pos:"な-adj.", lesson:5 },
+  { kanji:"感想", reading:"かんそう", english:"one's impressions / thoughts", pos:"n.", lesson:5 },
+  { kanji:"考慮", reading:"こうりょ", english:"consideration / to consider / to take account of", pos:"n./vt.", lesson:5 },
+  { kanji:"寄付", reading:"きふ", english:"contribution / donation / to contribute", pos:"n./vt.", lesson:5 },
+  { kanji:"公開", reading:"こうかい", english:"presentation / release / to open to the public", pos:"n./vt.", lesson:5 },
+  { kanji:"従業員", reading:"じゅうぎょういん", english:"employee", pos:"n.", lesson:5 },
+  { kanji:"解雇", reading:"かいこ", english:"dismissal / to fire / to dismiss", pos:"n./vt.", lesson:5 },
+  { kanji:"目指す", reading:"めざす", english:"to aim / to go toward", pos:"vt.", lesson:5 },
+  { kanji:"持参", reading:"じさん", english:"bringing / to bring", pos:"n./vt.", lesson:5 },
+  // Lesson 6
+  { kanji:"医薬品", reading:"いやくひん", english:"pharmaceutical drugs", pos:"n.", lesson:6 },
+  { kanji:"承認", reading:"しょうにん", english:"approval / to approve", pos:"n./vt.", lesson:6 },
+  { kanji:"規模", reading:"きぼ", english:"scale", pos:"n.", lesson:6 },
+  { kanji:"奇跡", reading:"きせき", english:"miracle", pos:"n.", lesson:6 },
+  { kanji:"手術", reading:"しゅじゅつ", english:"surgery / to do an operation", pos:"n./vt.", lesson:6 },
+  { kanji:"治療", reading:"ちりょう", english:"medical treatment / to treat / to cure", pos:"n./vt.", lesson:6 },
+  { kanji:"物産", reading:"ぶっさん", english:"products / commodities", pos:"n.", lesson:6 },
+  { kanji:"役目", reading:"やくめ", english:"duty / role", pos:"n.", lesson:6 },
+  { kanji:"雰囲気", reading:"ふんいき", english:"atmosphere", pos:"n.", lesson:6 },
+  { kanji:"経営", reading:"けいえい", english:"business management / to manage a firm", pos:"n./vt.", lesson:6 },
+  { kanji:"関心", reading:"かんしん", english:"interest / concern", pos:"n.", lesson:6 },
+  { kanji:"調理", reading:"ちょうり", english:"cooking / to cook", pos:"n./vt.", lesson:6 },
+  { kanji:"玉ねぎ", reading:"たまねぎ", english:"onion", pos:"n.", lesson:6 },
+  { kanji:"胡椒", reading:"こしょう", english:"pepper", pos:"n.", lesson:6 },
+  { kanji:"薄切り", reading:"うすぎり", english:"thin slice", pos:"n.", lesson:6 },
+  { kanji:"炒める", reading:"いためる", english:"to stir fry / to fry", pos:"vt.", lesson:6 },
+  { kanji:"揚げる", reading:"あげる", english:"to deep fry", pos:"vt.", lesson:6 },
+  { kanji:"煮込む", reading:"にこむ", english:"to stew", pos:"vt.", lesson:6 },
+  { kanji:"具材", reading:"ぐざい", english:"ingredients", pos:"n.", lesson:6 },
+  { kanji:"手早い", reading:"てばやい", english:"nimble / quick", pos:"い-adj.", lesson:6 },
+  { kanji:"調える", reading:"ととのえる", english:"to arrange / to prepare / to adjust", pos:"vt.", lesson:6 },
+  { kanji:"目安", reading:"めやす", english:"criterion / yard / aim", pos:"n.", lesson:6 },
+  { kanji:"焦がす", reading:"こがす", english:"to burn", pos:"vt.", lesson:6 },
+  { kanji:"検索", reading:"けんさく", english:"search / to search", pos:"n./vt.", lesson:6 },
+  { kanji:"大人しい", reading:"おとなしい", english:"obedient / quiet / tame / well-behaved", pos:"い-adj.", lesson:6 },
+  { kanji:"幼い", reading:"おさない", english:"young / childish / immature", pos:"い-adj.", lesson:6 },
+  // Lesson 7
+  { kanji:"株式", reading:"かぶしき", english:"stocks", pos:"n.", lesson:7 },
+  { kanji:"投資", reading:"とうし", english:"investment / to invest", pos:"n./vi.", lesson:7 },
+  { kanji:"作家", reading:"さっか", english:"writer / author", pos:"n.", lesson:7 },
+  { kanji:"天才", reading:"てんさい", english:"genius / prodigy", pos:"n.", lesson:7 },
+  { kanji:"常識", reading:"じょうしき", english:"common sense / general knowledge", pos:"n.", lesson:7 },
+  { kanji:"非常識", reading:"ひじょうしき", english:"lack of common sense / unreasonable / rude", pos:"n./な-adj.", lesson:7 },
+  { kanji:"観客", reading:"かんきゃく", english:"audience / spectator", pos:"n.", lesson:7 },
+  { kanji:"誤解", reading:"ごかい", english:"misunderstanding / to misunderstand", pos:"n./vt.", lesson:7 },
+  { kanji:"活躍", reading:"かつやく", english:"success / to flourish", pos:"n./vi.", lesson:7 },
+  { kanji:"創造力", reading:"そうぞうりょく", english:"creativity", pos:"n.", lesson:7 },
+  { kanji:"困難", reading:"こんなん", english:"difficulty / trouble / hardships / difficult", pos:"n./な-adj.", lesson:7 },
+  { kanji:"支える", reading:"ささえる", english:"to support / to hold up / to bolster", pos:"vt.", lesson:7 },
+  { kanji:"天然温泉", reading:"てんねんおんせん", english:"natural hot spring", pos:"n.", lesson:7 },
+  { kanji:"施設", reading:"しせつ", english:"facility", pos:"n.", lesson:7 },
+  { kanji:"名勝", reading:"めいしょう", english:"scenic beauty / scenic spot", pos:"n.", lesson:7 },
+  { kanji:"静寂", reading:"せいじゃく", english:"silence / silent / quiet", pos:"n./な-adj.", lesson:7 },
+  { kanji:"奥深い", reading:"おくぶかい", english:"deep / profound / abstruse", pos:"い-adj.", lesson:7 },
+  { kanji:"趣", reading:"おもむき", english:"meaning / influence / appearance / taste", pos:"n.", lesson:7 },
+  { kanji:"景観", reading:"けいかん", english:"scenery", pos:"n.", lesson:7 },
+  { kanji:"滝", reading:"たき", english:"waterfall", pos:"n.", lesson:7 },
+  { kanji:"広大", reading:"こうだい", english:"immensity / vast / immense", pos:"n./な-adj.", lesson:7 },
+  { kanji:"噴水", reading:"ふんすい", english:"fountain", pos:"n.", lesson:7 },
+  { kanji:"表情", reading:"ひょうじょう", english:"facial expression", pos:"n.", lesson:7 },
+  { kanji:"展示", reading:"てんじ", english:"exhibition / display / to exhibit", pos:"n./vt.", lesson:7 },
+  { kanji:"混雑", reading:"こんざつ", english:"congestion / to congest / to be crowded", pos:"n./vi.", lesson:7 },
+  { kanji:"独占", reading:"どくせん", english:"monopoly / to monopolize", pos:"n./vt.", lesson:7 },
+  // Lesson 8
+  { kanji:"熱帯", reading:"ねったい", english:"tropics / tropical zone", pos:"n.", lesson:8 },
+  { kanji:"気圧", reading:"きあつ", english:"atmospheric pressure", pos:"n.", lesson:8 },
+  { kanji:"上陸", reading:"じょうりく", english:"landing / to land / to go ashore", pos:"n./vi.", lesson:8 },
+  { kanji:"勢力", reading:"せいりょく", english:"power / influence", pos:"n.", lesson:8 },
+  { kanji:"接近", reading:"せっきん", english:"approach / to approach / to get close", pos:"n./vi.", lesson:8 },
+  { kanji:"強風", reading:"きょうふう", english:"strong wind", pos:"n.", lesson:8 },
+  { kanji:"高波", reading:"たかなみ", english:"high wave / storm surge", pos:"n.", lesson:8 },
+  { kanji:"太平洋", reading:"たいへいよう", english:"the Pacific Ocean", pos:"n.", lesson:8 },
+  { kanji:"実績", reading:"じっせき", english:"achievements / results / one's record", pos:"n.", lesson:8 },
+  { kanji:"提供", reading:"ていきょう", english:"offer / to offer / to supply with", pos:"n./vt.", lesson:8 },
+  { kanji:"領域", reading:"りょういき", english:"territory / field / domain", pos:"n.", lesson:8 },
+  { kanji:"修復", reading:"しゅうふく", english:"restoration / to restore / to repair", pos:"n./vt.", lesson:8 },
+  { kanji:"著作権", reading:"ちょさくけん", english:"copyright", pos:"n.", lesson:8 },
+  { kanji:"侵害", reading:"しんがい", english:"infringement / violation / to infringe", pos:"n./vt.", lesson:8 },
+  { kanji:"事実", reading:"じじつ", english:"fact / truth", pos:"n.", lesson:8 },
+  { kanji:"公共", reading:"こうきょう", english:"public / common", pos:"n.", lesson:8 },
+  { kanji:"住宅", reading:"じゅうたく", english:"housing / residence", pos:"n.", lesson:8 },
+  { kanji:"繁栄", reading:"はんえい", english:"prosperity / to prosper", pos:"n./vi.", lesson:8 },
+  { kanji:"選挙", reading:"せんきょ", english:"election", pos:"n.", lesson:8 },
+  { kanji:"規制", reading:"きせい", english:"regulation / control / to regulate", pos:"n./vt.", lesson:8 },
+  { kanji:"流通", reading:"りゅうつう", english:"circulation / distribution / to circulate", pos:"n./vi.", lesson:8 },
+  { kanji:"介護", reading:"かいご", english:"nursing / caregiving / to look after", pos:"n./vi.", lesson:8 },
+  { kanji:"設定", reading:"せってい", english:"setting / establishment / to set up / to configure", pos:"n./vt.", lesson:8 },
+  { kanji:"再起動", reading:"さいきどう", english:"reboot / to reboot", pos:"n./vt./vi.", lesson:8 },
+  { kanji:"偽物", reading:"にせもの", english:"counterfeit / imitation", pos:"n.", lesson:8 },
+  { kanji:"消費者", reading:"しょうひしゃ", english:"consumer", pos:"n.", lesson:8 },
+  { kanji:"削除", reading:"さくじょ", english:"deletion / to delete", pos:"n./vt.", lesson:8 },
+  { kanji:"根絶", reading:"こんぜつ", english:"eradication / extermination / to eradicate", pos:"n./vt.", lesson:8 },
+  { kanji:"素材", reading:"そざい", english:"raw material / material", pos:"n.", lesson:8 },
+  // Lesson 9
+  { kanji:"緊張", reading:"きんちょう", english:"tension / to be tense / to be nervous", pos:"n./vi.", lesson:9 },
+  { kanji:"睡眠", reading:"すいみん", english:"sleep", pos:"n.", lesson:9 },
+  { kanji:"裏切る", reading:"うらぎる", english:"to betray", pos:"vt.", lesson:9 },
+  { kanji:"公平", reading:"こうへい", english:"fairness / justice / fair", pos:"n./な-adj.", lesson:9 },
+  { kanji:"破壊", reading:"はかい", english:"destruction / to destroy", pos:"n./vt.", lesson:9 },
+  { kanji:"天然資源", reading:"てんねんしげん", english:"natural resources", pos:"n.", lesson:9 },
+  { kanji:"行為", reading:"こうい", english:"act / behavior", pos:"n.", lesson:9 },
+  { kanji:"行列", reading:"ぎょうれつ", english:"line / queue", pos:"n.", lesson:9 },
+  { kanji:"有能", reading:"ゆうのう", english:"competent / able / capable", pos:"な-adj.", lesson:9 },
+  { kanji:"結論", reading:"けつろん", english:"conclusion / to conclude", pos:"n./vi./vt.", lesson:9 },
+  { kanji:"冗談", reading:"じょうだん", english:"joke", pos:"n.", lesson:9 },
+  { kanji:"哲学", reading:"てつがく", english:"philosophy", pos:"n.", lesson:9 },
+  { kanji:"少子化", reading:"しょうしか", english:"declining birthrate", pos:"n.", lesson:9 },
+  { kanji:"高齢化", reading:"こうれいか", english:"aging / population aging", pos:"n.", lesson:9 },
+  { kanji:"継続", reading:"けいぞく", english:"continuation / to continue", pos:"n./vt.", lesson:9 },
+  { kanji:"役割", reading:"やくわり", english:"role / part", pos:"n.", lesson:9 },
+  { kanji:"雇用", reading:"こよう", english:"employment / to employ / to hire", pos:"n./vt.", lesson:9 },
+  { kanji:"制限", reading:"せいげん", english:"limitation / restriction / to limit", pos:"n./vt.", lesson:9 },
+  { kanji:"労働人口", reading:"ろうどうじんこう", english:"working population", pos:"n.", lesson:9 },
+  { kanji:"活力", reading:"かつりょく", english:"vitality", pos:"n.", lesson:9 },
+  { kanji:"負担", reading:"ふたん", english:"burden / to be burdened with / to bear", pos:"n./vt.", lesson:9 },
+  { kanji:"社会保障", reading:"しゃかいほしょう", english:"social insurance / social security", pos:"n.", lesson:9 },
+  { kanji:"育児", reading:"いくじ", english:"childcare", pos:"n.", lesson:9 },
+  { kanji:"悩む", reading:"なやむ", english:"to be worried / to be troubled", pos:"vi.", lesson:9 },
+  { kanji:"検討", reading:"けんとう", english:"consideration / examination / to consider", pos:"n./vt.", lesson:9 },
+  { kanji:"羨ましい", reading:"うらやましい", english:"jealous / envious", pos:"い-adj.", lesson:9 },
+  { kanji:"甚だしい", reading:"はなはだしい", english:"extreme / intense / serious", pos:"い-adj.", lesson:9 },
+  { kanji:"率直", reading:"そっちょく", english:"frank / honest", pos:"な-adj.", lesson:9 },
+  { kanji:"奇妙", reading:"きみょう", english:"strange / odd / bizarre", pos:"な-adj.", lesson:9 },
+  // Lesson 10
+  { kanji:"避難所", reading:"ひなんじょ", english:"shelter / place of refuge", pos:"n.", lesson:10 },
+  { kanji:"見落とす", reading:"みおとす", english:"to overlook / to fail to notice", pos:"vt.", lesson:10 },
+  { kanji:"過去", reading:"かこ", english:"the past", pos:"n.", lesson:10 },
+  { kanji:"備える", reading:"そなえる", english:"to furnish / to equip / to prepare for", pos:"vt.", lesson:10 },
+  { kanji:"自治体", reading:"じちたい", english:"municipality / local government", pos:"n.", lesson:10 },
+  { kanji:"確保", reading:"かくほ", english:"guarantee / to ensure / to secure", pos:"n./vt.", lesson:10 },
+  { kanji:"軽減", reading:"けいげん", english:"reduction / to reduce / to lessen", pos:"n./vt.", lesson:10 },
+  { kanji:"得意", reading:"とくい", english:"pride / triumph / one's specialty / proud", pos:"n./な-adj.", lesson:10 },
+  { kanji:"介護", reading:"かいご", english:"caregiving / to look after / to care for", pos:"n./vt.", lesson:10 },
+  { kanji:"所有権", reading:"しょゆうけん", english:"ownership", pos:"n.", lesson:10 },
+  { kanji:"争う", reading:"あらそう", english:"to compete / to dispute / to fight", pos:"vi./vt.", lesson:10 },
+  { kanji:"議論", reading:"ぎろん", english:"argument / discussion / to argue", pos:"n./vi./vt.", lesson:10 },
+  { kanji:"対立", reading:"たいりつ", english:"confrontation / opposition / to confront", pos:"n./vi.", lesson:10 },
+  { kanji:"改善", reading:"かいぜん", english:"improvement / to improve", pos:"n./vt.", lesson:10 },
+  { kanji:"要因", reading:"よういん", english:"factor / cause", pos:"n.", lesson:10 },
+  { kanji:"中断", reading:"ちゅうだん", english:"interruption / to interrupt", pos:"n./vt.", lesson:10 },
+  { kanji:"果たす", reading:"はたす", english:"to accomplish / to achieve / to perform", pos:"vt.", lesson:10 },
+  { kanji:"農産物", reading:"のうさんぶつ", english:"agricultural products", pos:"n.", lesson:10 },
+  { kanji:"労働生産性", reading:"ろうどうせいさんせい", english:"labor productivity", pos:"n.", lesson:10 },
+  { kanji:"惑星", reading:"わくせい", english:"planet", pos:"n.", lesson:10 },
+  { kanji:"拡大", reading:"かくだい", english:"expansion / magnification / to expand", pos:"n./vt.", lesson:10 },
+  { kanji:"防風", reading:"ぼうふう", english:"windproof", pos:"n.", lesson:10 },
+  { kanji:"防水", reading:"ぼうすい", english:"waterproof", pos:"n.", lesson:10 },
+  { kanji:"性能", reading:"せいのう", english:"ability / performance", pos:"n.", lesson:10 },
+  { kanji:"活性化", reading:"かっせいか", english:"activation / to revitalize / to liven up", pos:"n./vt./vi.", lesson:10 },
+  { kanji:"設備", reading:"せつび", english:"utilities / facilities / to equip", pos:"n./vt.", lesson:10 },
+  { kanji:"促進", reading:"そくしん", english:"promotion / encouragement / to promote", pos:"n./vt.", lesson:10 },
+  { kanji:"移住", reading:"いじゅう", english:"immigration / emigration / to immigrate", pos:"n./vi.", lesson:10 },
+  { kanji:"生息", reading:"せいそく", english:"inhabiting / to inhabit", pos:"n./vi.", lesson:10 },
+  { kanji:"絶滅", reading:"ぜつめつ", english:"Extinction / to be extinct", pos:"n./vi.", lesson:10 },
+  { kanji:"繁殖", reading:"はんしょく", english:"breeding / to breed", pos:"n./vi.", lesson:10 },
+  { kanji:"保護", reading:"ほご", english:"protection / conservation / to protect", pos:"n./vt.", lesson:10 },
+  { kanji:"標高", reading:"ひょうこう", english:"altitude / elevation", pos:"n.", lesson:10 },
+];
+
+// ====== STATE ======
+let deck = [...vocab];
+let currentIndex = 0;
+let isFlipped = false;
+let mode = 'kanji'; // 'kanji', 'english', 'reading'
+let correctCount = 0;
+let wrongCount = 0;
+let selectedLessons = new Set([1,2,3,4,5,6,7,8,9,10]);
+
+// ====== INIT ======
+function init() {
+  buildLessonPills();
+  filterDeck();
+  renderCard();
+  updateStats();
+}
+
+function buildLessonPills() {
+  const container = document.getElementById('lesson-pills');
+  const allPill = document.createElement('button');
+  allPill.className = 'pill active';
+  allPill.id = 'pill-all';
+  allPill.textContent = 'All Lessons';
+  allPill.onclick = () => toggleAll();
+  container.appendChild(allPill);
+
+  for (let i = 1; i <= 10; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'pill active';
+    btn.id = `pill-${i}`;
+    btn.textContent = `Lesson ${i}`;
+    btn.onclick = () => toggleLesson(i);
+    container.appendChild(btn);
+  }
+}
+
+function toggleAll() {
+  const allActive = selectedLessons.size === 10;
+  if (allActive) {
+    // keep at least one
+    return;
+  }
+  selectedLessons = new Set([1,2,3,4,5,6,7,8,9,10]);
+  for (let i = 1; i <= 10; i++) document.getElementById(`pill-${i}`).classList.add('active');
+  document.getElementById('pill-all').classList.add('active');
+  filterDeck();
+}
+
+function toggleLesson(n) {
+  if (selectedLessons.has(n) && selectedLessons.size === 1) return; // keep at least one
+  if (selectedLessons.has(n)) selectedLessons.delete(n);
+  else selectedLessons.add(n);
+  document.getElementById(`pill-${n}`).classList.toggle('active', selectedLessons.has(n));
+  document.getElementById('pill-all').classList.toggle('active', selectedLessons.size === 10);
+  filterDeck();
+}
+
+function filterDeck() {
+  deck = vocab.filter(v => selectedLessons.has(v.lesson));
+  currentIndex = 0;
+  isFlipped = false;
+  document.getElementById('card').classList.remove('flipped');
+  document.getElementById('check-row').classList.remove('visible');
+  renderCard();
+  document.getElementById('total-count').textContent = deck.length;
+  updateProgress();
+}
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('mode-' + m).classList.add('active');
+  isFlipped = false;
+  document.getElementById('card').classList.remove('flipped');
+  document.getElementById('check-row').classList.remove('visible');
+  document.getElementById('flip-btn-main').textContent = 'Reveal';
+  renderCard();
+}
+
+function renderCard() {
+  if (!deck.length) return;
+  const card = deck[currentIndex];
+
+  const frontKanji = document.getElementById('front-kanji');
+  const frontPos = document.getElementById('front-pos');
+  const backKanjiSmall = document.getElementById('back-kanji-small');
+  const backReading = document.getElementById('back-reading');
+  const backEnglish = document.getElementById('back-english');
+
+  if (mode === 'kanji') {
+    // Front: kanji. Back: hiragana reading + English as bonus
+    frontKanji.textContent = card.kanji;
+    frontKanji.style.fontSize = '';
+    frontPos.textContent = card.pos;
+    frontPos.style.display = 'inline-block';
+    backKanjiSmall.textContent = card.kanji;
+    backReading.textContent = card.reading;
+    backReading.style.display = 'block';
+    backReading.style.fontSize = '32px';
+    backEnglish.textContent = card.english;
+    backEnglish.style.display = 'block';
+
+  } else if (mode === 'english') {
+    // Front: kanji. Back: English meaning, reading shown small as hint
+    frontKanji.textContent = card.kanji;
+    frontKanji.style.fontSize = '';
+    frontPos.textContent = card.pos;
+    frontPos.style.display = 'inline-block';
+    backKanjiSmall.textContent = card.reading;
+    backReading.textContent = card.english;
+    backReading.style.display = 'block';
+    backReading.style.fontSize = '18px';
+    backEnglish.textContent = '';
+    backEnglish.style.display = 'none';
+
+  } else if (mode === 'reading') {
+    // Front: hiragana only. Back: English meaning, kanji shown small as bonus
+    frontKanji.textContent = card.reading;
+    frontKanji.style.fontSize = '48px';
+    frontPos.textContent = card.pos;
+    frontPos.style.display = 'inline-block';
+    backKanjiSmall.textContent = card.kanji;
+    backReading.textContent = card.english;
+    backReading.style.display = 'block';
+    backReading.style.fontSize = '18px';
+    backEnglish.textContent = '';
+    backEnglish.style.display = 'none';
+  }
+
+  updateProgress();
+  document.getElementById('prev-btn').disabled = currentIndex === 0;
+  document.getElementById('next-btn').disabled = currentIndex === deck.length - 1;
+
+  const flipBtnMain = document.getElementById('flip-btn-main');
+  flipBtnMain.textContent = isFlipped ? 'Hide' : 'Reveal';
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  const card = document.getElementById('card');
+  if (isFlipped) {
+    card.classList.add('flipped');
+    document.getElementById('check-row').classList.add('visible');
+    document.getElementById('flip-btn-main').textContent = 'Hide';
+  } else {
+    card.classList.remove('flipped');
+    document.getElementById('check-row').classList.remove('visible');
+    document.getElementById('flip-btn-main').textContent = 'Reveal';
+  }
+}
+
+function nextCard() {
+  if (currentIndex < deck.length - 1) {
+    currentIndex++;
+    isFlipped = false;
+    document.getElementById('card').classList.remove('flipped');
+    document.getElementById('check-row').classList.remove('visible');
+    document.getElementById('flip-btn-main').textContent = 'Reveal';
+    renderCard();
+  }
+}
+
+function prevCard() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    isFlipped = false;
+    document.getElementById('card').classList.remove('flipped');
+    document.getElementById('check-row').classList.remove('visible');
+    document.getElementById('flip-btn-main').textContent = 'Reveal';
+    renderCard();
+  }
+}
+
+function markCard(correct) {
+  if (correct) {
+    correctCount++;
+    document.getElementById('correct-count').textContent = correctCount;
+  } else {
+    wrongCount++;
+    document.getElementById('wrong-count').textContent = wrongCount;
+  }
+  // brief flash
+  const checkRow = document.getElementById('check-row');
+  checkRow.style.opacity = '0.3';
+  setTimeout(() => {
+    checkRow.style.opacity = '1';
+    nextCard();
+  }, 180);
+}
+
+function shuffleDeck() {
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  currentIndex = 0;
+  isFlipped = false;
+  document.getElementById('card').classList.remove('flipped');
+  document.getElementById('check-row').classList.remove('visible');
+  document.getElementById('flip-btn-main').textContent = 'Reveal';
+  renderCard();
+}
+
+function resetStats() {
+  correctCount = 0;
+  wrongCount = 0;
+  currentIndex = 0;
+  isFlipped = false;
+  document.getElementById('correct-count').textContent = 0;
+  document.getElementById('wrong-count').textContent = 0;
+  document.getElementById('card').classList.remove('flipped');
+  document.getElementById('check-row').classList.remove('visible');
+  document.getElementById('flip-btn-main').textContent = 'Reveal';
+  filterDeck();
+}
+
+function updateProgress() {
+  const pct = deck.length ? ((currentIndex + 1) / deck.length * 100).toFixed(0) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${currentIndex + 1} / ${deck.length}`;
+}
+
+function updateStats() {
+  document.getElementById('total-count').textContent = deck.length;
+}
+
+// keyboard nav
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'l') nextCard();
+  else if (e.key === 'ArrowLeft' || e.key === 'h') prevCard();
+  else if (e.key === ' ' || e.key === 'f') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'k' || e.key === '1') markCard(true);
+  else if (e.key === 'j' || e.key === '0') markCard(false);
+});
+
+init();
+</script>
+</body>
+</html>
