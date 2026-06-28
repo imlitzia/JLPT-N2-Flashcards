@@ -394,6 +394,98 @@
     header { padding: 16px 20px; }
   }
 
+  /* --- Starred words tab --- */
+  .tab-container {
+    width: 100%;
+    max-width: 780px;
+    display: none;
+    flex-direction: column;
+    padding: 20px 16px;
+  }
+  .tab-container.active { display: flex; }
+
+  .starred-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .starred-table thead {
+    background: rgba(0,0,0,0.2);
+  }
+  .starred-table th {
+    padding: 12px;
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+  }
+  .starred-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    color: var(--ink);
+    font-size: 14px;
+  }
+  .starred-table tr:last-child td {
+    border-bottom: none;
+  }
+  .starred-table td:first-child {
+    font-family: var(--font-japanese);
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .starred-table td:nth-child(2) {
+    font-family: var(--font-japanese-sans);
+    color: var(--vermillion);
+  }
+  .starred-table td:nth-child(4) {
+    text-align: center;
+  }
+
+  .remove-star-btn {
+    padding: 4px 10px;
+    font-size: 11px;
+    background: rgba(192,57,43,0.1);
+    border: 1px solid rgba(192,57,43,0.3);
+    color: var(--vermillion);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .remove-star-btn:hover {
+    background: rgba(192,57,43,0.2);
+  }
+
+  .empty-stars {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 16px;
+    font-size: 14px;
+  }
+
+  .star-icon {
+    font-size: 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s;
+    margin-left: 10px;
+  }
+  .star-icon.unstarred {
+    opacity: 0.4;
+    color: var(--muted);
+  }
+  .star-icon.starred {
+    color: var(--gold);
+    text-shadow: 0 0 4px rgba(201,168,76,0.4);
+  }
+  .star-icon:hover {
+    transform: scale(1.2);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .card { transition: none; }
   }
@@ -427,6 +519,7 @@
     <button class="mode-btn active" id="mode-kanji" onclick="setMode('kanji')">漢字 → Reading</button>
     <button class="mode-btn" id="mode-english" onclick="setMode('english')">漢字 → English</button>
     <button class="mode-btn" id="mode-reading" onclick="setMode('reading')">Reading → English</button>
+    <button class="mode-btn" id="mode-starred" onclick="setMode('starred')">⭐ Starred</button>
   </div>
   <button class="btn primary" onclick="shuffleDeck()">🔀 Shuffle</button>
   <button class="btn" onclick="resetStats()">↺ Reset</button>
@@ -440,7 +533,7 @@
 </div>
 
 <div class="card-area">
-  <div class="card-scene" onclick="flipCard()">
+  <div class="card-scene" onclick="flipCard()" id="card-scene">
     <div class="card" id="card">
       <div class="card-face">
         <div class="card-face-label">FRONT</div>
@@ -459,12 +552,17 @@
 
   <div class="nav-row">
     <button class="flip-btn" onclick="flipCard()" id="flip-btn-main">Reveal</button>
+    <span class="star-icon unstarred" id="star-btn" onclick="toggleStar()">⭐</span>
   </div>
 
   <div class="check-row" id="check-row">
     <button class="check-btn wrong" onclick="markCard(false)">✗ Didn't know</button>
     <button class="check-btn right" onclick="markCard(true)">✓ Got it!</button>
   </div>
+</div>
+
+<div class="tab-container" id="starred-tab">
+  <div id="starred-content"></div>
 </div>
 
 <script>
@@ -827,13 +925,15 @@ const vocab = [
 let deck = [...vocab];
 let currentIndex = 0;
 let isFlipped = false;
-let mode = 'kanji'; // 'kanji', 'english', 'reading'
+let mode = 'kanji'; // 'kanji', 'english', 'reading', 'starred'
 let correctCount = 0;
 let wrongCount = 0;
 let selectedLessons = new Set([1,2,3,4,5,6,7,8,9,10]);
+let starredWords = new Set(); // store kanji strings of starred words
 
 // ====== INIT ======
 function init() {
+  loadStarred();
   buildLessonPills();
   filterDeck();
   renderCard();
@@ -895,11 +995,31 @@ function setMode(m) {
   mode = m;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('mode-' + m).classList.add('active');
-  isFlipped = false;
-  document.getElementById('card').classList.remove('flipped');
-  document.getElementById('check-row').classList.remove('visible');
-  document.getElementById('flip-btn-main').textContent = 'Reveal';
-  renderCard();
+  
+  if (m === 'starred') {
+    // Show starred tab
+    document.getElementById('card-scene').parentElement.style.display = 'none';
+    document.querySelector('.nav-row').style.display = 'none';
+    document.getElementById('check-row').style.display = 'none';
+    document.getElementById('lesson-pills').style.display = 'none';
+    document.querySelector('.progress-wrap').style.display = 'none';
+    document.getElementById('starred-tab').classList.add('active');
+    renderStarredTab();
+  } else {
+    // Hide starred tab, show card
+    document.getElementById('card-scene').parentElement.style.display = 'flex';
+    document.querySelector('.nav-row').style.display = 'flex';
+    document.getElementById('lesson-pills').style.display = 'flex';
+    document.querySelector('.progress-wrap').style.display = 'block';
+    document.getElementById('check-row').style.display = ''; // Clear inline style
+    document.getElementById('starred-tab').classList.remove('active');
+    
+    isFlipped = false;
+    document.getElementById('card').classList.remove('flipped');
+    document.getElementById('check-row').classList.remove('visible');
+    document.getElementById('flip-btn-main').textContent = 'Reveal';
+    renderCard();
+  }
 }
 
 function renderCard() {
@@ -956,6 +1076,7 @@ function renderCard() {
 
   const flipBtnMain = document.getElementById('flip-btn-main');
   flipBtnMain.textContent = isFlipped ? 'Hide' : 'Reveal';
+  updateStarIcon();
 }
 
 function flipCard() {
@@ -1033,6 +1154,96 @@ function updateProgress() {
 
 function updateStats() {
   document.getElementById('total-count').textContent = deck.length;
+}
+
+// ====== STARRED WORDS ======
+function loadStarred() {
+  const saved = localStorage.getItem('jlpt-starred');
+  if (saved) {
+    starredWords = new Set(JSON.parse(saved));
+  }
+}
+
+function saveStarred() {
+  localStorage.setItem('jlpt-starred', JSON.stringify([...starredWords]));
+}
+
+function toggleStar() {
+  if (!deck.length) return;
+  const card = deck[currentIndex];
+  if (starredWords.has(card.kanji)) {
+    starredWords.delete(card.kanji);
+  } else {
+    starredWords.add(card.kanji);
+  }
+  saveStarred();
+  updateStarIcon();
+}
+
+function updateStarIcon() {
+  if (!deck.length || mode === 'starred') {
+    document.getElementById('star-btn').style.display = 'none';
+    return;
+  }
+  document.getElementById('star-btn').style.display = 'inline-block';
+  const card = deck[currentIndex];
+  const starBtn = document.getElementById('star-btn');
+  if (starredWords.has(card.kanji)) {
+    starBtn.classList.remove('unstarred');
+    starBtn.classList.add('starred');
+  } else {
+    starBtn.classList.remove('starred');
+    starBtn.classList.add('unstarred');
+  }
+}
+
+function renderStarredTab() {
+  const starredCards = vocab.filter(v => starredWords.has(v.kanji));
+  const content = document.getElementById('starred-content');
+  
+  if (starredCards.length === 0) {
+    content.innerHTML = '<div class="empty-stars">No starred words yet. Mark words with ⭐ to see them here!</div>';
+    return;
+  }
+
+  let html = `
+    <table class="starred-table">
+      <thead>
+        <tr>
+          <th>Kanji</th>
+          <th>Reading</th>
+          <th>English</th>
+          <th>Lesson</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  starredCards.forEach(card => {
+    html += `
+      <tr>
+        <td>${card.kanji}</td>
+        <td>${card.reading}</td>
+        <td>${card.english}</td>
+        <td>Lesson ${card.lesson}</td>
+        <td><button class="remove-star-btn" onclick="removeStarred('${card.kanji.replace(/'/g, "\\'")}')">Remove</button></td>
+      </tr>
+    `;
+  });
+
+  html += `
+      </tbody>
+    </table>
+  `;
+
+  content.innerHTML = html;
+}
+
+function removeStarred(kanji) {
+  starredWords.delete(kanji);
+  saveStarred();
+  renderStarredTab();
 }
 
 // keyboard nav
