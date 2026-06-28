@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JLPT N2 Flashcards</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap');
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
@@ -19,10 +17,14 @@
     --muted: #6b6b80;
     --card-bg: #faf7f2;
     --shadow: rgba(26,26,46,0.18);
+    /* System font stacks — no internet needed */
+    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-japanese: "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Yu Mincho", "YuMincho", "MS Mincho", serif;
+    --font-japanese-sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", "Meiryo", sans-serif;
   }
 
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-ui);
     background: var(--ink);
     color: var(--paper);
     min-height: 100vh;
@@ -47,7 +49,7 @@
     gap: 10px;
   }
   .logo-badge {
-    font-family: 'Noto Serif JP', serif;
+    font-family: var(--font-japanese);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.15em;
@@ -101,7 +103,7 @@
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.12);
     color: var(--paper);
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-ui);
     font-size: 13px;
     padding: 8px 14px;
     border-radius: 6px;
@@ -124,7 +126,7 @@
   .mode-btn {
     padding: 8px 16px;
     font-size: 12px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-ui);
     font-weight: 500;
     letter-spacing: 0.04em;
     cursor: pointer;
@@ -141,7 +143,7 @@
   .btn {
     padding: 8px 18px;
     font-size: 12px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-ui);
     font-weight: 500;
     letter-spacing: 0.05em;
     cursor: pointer;
@@ -239,12 +241,12 @@
     text-transform: uppercase;
     color: var(--muted);
     margin-bottom: 16px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-ui);
     font-weight: 500;
   }
 
   .kanji-display {
-    font-family: 'Noto Serif JP', serif;
+    font-family: var(--font-japanese);
     font-size: 72px;
     font-weight: 700;
     color: var(--ink);
@@ -257,7 +259,7 @@
   .pos-tag {
     display: inline-block;
     font-size: 10px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-ui);
     color: var(--vermillion);
     background: rgba(192,57,43,0.08);
     border: 1px solid rgba(192,57,43,0.2);
@@ -271,13 +273,13 @@
     bottom: 14px;
     font-size: 10px;
     color: rgba(100,100,120,0.5);
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-ui);
     letter-spacing: 0.08em;
   }
 
   /* Back face */
   .reading-display {
-    font-family: 'Noto Sans JP', sans-serif;
+    font-family: var(--font-japanese-sans);
     font-size: 28px;
     font-weight: 400;
     color: var(--vermillion);
@@ -286,7 +288,7 @@
   }
 
   .english-display {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-ui);
     font-size: 15px;
     font-weight: 400;
     color: var(--ink);
@@ -297,7 +299,7 @@
   }
 
   .kanji-small {
-    font-family: 'Noto Serif JP', serif;
+    font-family: var(--font-japanese);
     font-size: 20px;
     color: var(--muted);
     margin-bottom: 8px;
@@ -305,7 +307,7 @@
 
   /* No kanji case */
   .kana-only-display {
-    font-family: 'Noto Serif JP', serif;
+    font-family: var(--font-japanese);
     font-size: 52px;
     font-weight: 700;
     color: var(--ink);
@@ -320,36 +322,13 @@
     align-items: center;
   }
 
-  .nav-btn {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.15);
-    background: rgba(255,255,255,0.06);
-    color: var(--paper);
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-  }
-  .nav-btn:hover { background: rgba(255,255,255,0.14); }
-  .nav-btn:disabled { opacity: 0.3; cursor: default; }
-
   .flip-btn {
     padding: 14px 36px;
     border-radius: 28px;
     border: none;
     background: var(--vermillion);
     color: #fff;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 16px rgba(192,57,43,0.35);
+    font-family: var(--font-ui);
   }
   .flip-btn:hover { background: var(--vermillion-light); transform: translateY(-1px); }
 
@@ -365,7 +344,7 @@
     padding: 9px 22px;
     border-radius: 6px;
     border: none;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-ui);
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.06em;
@@ -399,7 +378,7 @@
     border-radius: 20px;
     border: 1px solid rgba(255,255,255,0.1);
     font-size: 11px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-ui);
     cursor: pointer;
     transition: all 0.2s;
     background: transparent;
@@ -479,9 +458,7 @@
   </div>
 
   <div class="nav-row">
-    <button class="nav-btn" id="prev-btn" onclick="prevCard()">←</button>
     <button class="flip-btn" onclick="flipCard()" id="flip-btn-main">Reveal</button>
-    <button class="nav-btn" id="next-btn" onclick="nextCard()">→</button>
   </div>
 
   <div class="check-row" id="check-row">
@@ -976,8 +953,6 @@ function renderCard() {
   }
 
   updateProgress();
-  document.getElementById('prev-btn').disabled = currentIndex === 0;
-  document.getElementById('next-btn').disabled = currentIndex === deck.length - 1;
 
   const flipBtnMain = document.getElementById('flip-btn-main');
   flipBtnMain.textContent = isFlipped ? 'Hide' : 'Reveal';
@@ -997,20 +972,9 @@ function flipCard() {
   }
 }
 
-function nextCard() {
+function advanceCard() {
   if (currentIndex < deck.length - 1) {
     currentIndex++;
-    isFlipped = false;
-    document.getElementById('card').classList.remove('flipped');
-    document.getElementById('check-row').classList.remove('visible');
-    document.getElementById('flip-btn-main').textContent = 'Reveal';
-    renderCard();
-  }
-}
-
-function prevCard() {
-  if (currentIndex > 0) {
-    currentIndex--;
     isFlipped = false;
     document.getElementById('card').classList.remove('flipped');
     document.getElementById('check-row').classList.remove('visible');
@@ -1027,12 +991,11 @@ function markCard(correct) {
     wrongCount++;
     document.getElementById('wrong-count').textContent = wrongCount;
   }
-  // brief flash
   const checkRow = document.getElementById('check-row');
   checkRow.style.opacity = '0.3';
   setTimeout(() => {
     checkRow.style.opacity = '1';
-    nextCard();
+    advanceCard();
   }, 180);
 }
 
@@ -1074,9 +1037,7 @@ function updateStats() {
 
 // keyboard nav
 document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight' || e.key === 'l') nextCard();
-  else if (e.key === 'ArrowLeft' || e.key === 'h') prevCard();
-  else if (e.key === ' ' || e.key === 'f') { e.preventDefault(); flipCard(); }
+  if (e.key === ' ' || e.key === 'f') { e.preventDefault(); flipCard(); }
   else if (e.key === 'k' || e.key === '1') markCard(true);
   else if (e.key === 'j' || e.key === '0') markCard(false);
 });
