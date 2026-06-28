@@ -332,6 +332,21 @@
   }
   .flip-btn:hover { background: var(--vermillion-light); transform: translateY(-1px); }
 
+  .arrow-btn {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
+    color: var(--paper);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .arrow-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.4); }
+  .arrow-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .arrow-btn:disabled:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+
   /* --- Self-check row --- */
   .check-row {
     display: none;
@@ -551,7 +566,9 @@
   </div>
 
   <div class="nav-row">
+    <button class="arrow-btn" onclick="goToPrevious()" id="prev-btn">← Previous</button>
     <button class="flip-btn" onclick="flipCard()" id="flip-btn-main">Reveal</button>
+    <button class="arrow-btn" onclick="goToNext()" id="next-btn">Next →</button>
     <span class="star-icon unstarred" id="star-btn" onclick="toggleStar()">⭐</span>
   </div>
 
@@ -989,6 +1006,7 @@ function filterDeck() {
   renderCard();
   document.getElementById('total-count').textContent = deck.length;
   updateProgress();
+  updateNavButtons();
 }
 
 function setMode(m) {
@@ -1077,6 +1095,7 @@ function renderCard() {
   const flipBtnMain = document.getElementById('flip-btn-main');
   flipBtnMain.textContent = isFlipped ? 'Hide' : 'Reveal';
   updateStarIcon();
+  updateNavButtons();
 }
 
 function flipCard() {
@@ -1101,7 +1120,37 @@ function advanceCard() {
     document.getElementById('check-row').classList.remove('visible');
     document.getElementById('flip-btn-main').textContent = 'Reveal';
     renderCard();
+    updateNavButtons();
   }
+}
+
+function goToPrevious() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    isFlipped = false;
+    document.getElementById('card').classList.remove('flipped');
+    document.getElementById('check-row').classList.remove('visible');
+    document.getElementById('flip-btn-main').textContent = 'Reveal';
+    renderCard();
+    updateNavButtons();
+  }
+}
+
+function goToNext() {
+  if (currentIndex < deck.length - 1) {
+    currentIndex++;
+    isFlipped = false;
+    document.getElementById('card').classList.remove('flipped');
+    document.getElementById('check-row').classList.remove('visible');
+    document.getElementById('flip-btn-main').textContent = 'Reveal';
+    renderCard();
+    updateNavButtons();
+  }
+}
+
+function updateNavButtons() {
+  document.getElementById('prev-btn').disabled = currentIndex === 0;
+  document.getElementById('next-btn').disabled = currentIndex === deck.length - 1;
 }
 
 function markCard(correct) {
@@ -1112,6 +1161,12 @@ function markCard(correct) {
     wrongCount++;
     document.getElementById('wrong-count').textContent = wrongCount;
   }
+  // Instantly flip card back to front
+  isFlipped = false;
+  document.getElementById('card').classList.remove('flipped');
+  document.getElementById('check-row').classList.remove('visible');
+  document.getElementById('flip-btn-main').textContent = 'Reveal';
+  
   const checkRow = document.getElementById('check-row');
   checkRow.style.opacity = '0.3';
   setTimeout(() => {
