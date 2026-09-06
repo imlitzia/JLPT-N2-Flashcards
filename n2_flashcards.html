@@ -16,21 +16,46 @@
     --gold: #c9a84c;
     --muted: #6b6b80;
     --card-bg: #faf7f2;
+    --card-back-bg: #fefcf7;
+    --surface: rgba(255,255,255,0.06);
+    --surface-strong: rgba(255,255,255,0.12);
+    --surface-soft: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.12);
+    --border-strong: rgba(255,255,255,0.18);
     --shadow: rgba(26,26,46,0.18);
+    --bg: var(--ink);
+    --text: var(--paper);
     /* System font stacks — no internet needed */
     --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-japanese: "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Yu Mincho", "YuMincho", "MS Mincho", serif;
     --font-japanese-sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", "Meiryo", sans-serif;
   }
 
+  body[data-theme="light"] {
+    --ink: #1f2430;
+    --paper: #1f2430;
+    --paper-dark: #f8f4eb;
+    --card-bg: #ffffff;
+    --card-back-bg: #fcf8f0;
+    --surface: rgba(0,0,0,0.04);
+    --surface-strong: rgba(0,0,0,0.08);
+    --surface-soft: rgba(0,0,0,0.03);
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.12);
+    --shadow: rgba(15,23,42,0.12);
+    --bg: #f7f4ee;
+    --text: var(--paper);
+  }
+
   body {
     font-family: var(--font-ui);
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--bg);
+    color: var(--text);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
   /* --- Header --- */
@@ -40,8 +65,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-soft);
   }
   .logo {
     display: flex;
@@ -100,9 +125,9 @@
   }
 
   .lesson-select {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    color: var(--paper);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
     font-family: var(--font-ui);
     font-size: 13px;
     padding: 8px 14px;
@@ -118,8 +143,8 @@
 
   .mode-toggle {
     display: flex;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 6px;
     overflow: hidden;
   }
@@ -148,12 +173,12 @@
     letter-spacing: 0.05em;
     cursor: pointer;
     border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.15);
-    background: rgba(255,255,255,0.06);
-    color: var(--paper);
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text);
     transition: all 0.2s;
   }
-  .btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); }
+  .btn:hover { background: var(--surface-strong); border-color: var(--border-strong); }
   .btn.primary { background: var(--vermillion); border-color: var(--vermillion); }
   .btn.primary:hover { background: var(--vermillion-light); }
 
@@ -231,7 +256,7 @@
 
   .card-back {
     transform: rotateY(180deg);
-    background: #fefcf7;
+    background: var(--card-back-bg);
   }
 
   /* Front face */
@@ -335,17 +360,17 @@
   .arrow-btn {
     padding: 10px 12px;
     border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.08);
-    color: var(--paper);
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text);
     font-family: var(--font-ui);
     font-size: 16px;
     cursor: pointer;
     transition: all 0.2s;
   }
-  .arrow-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.4); }
+  .arrow-btn:hover { background: var(--surface-strong); border-color: var(--border-strong); }
   .arrow-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .arrow-btn:disabled:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+  .arrow-btn:disabled:hover { background: var(--surface); border-color: var(--border-strong); }
 
   /* --- Self-check row --- */
   .check-row {
@@ -391,7 +416,7 @@
   .pill {
     padding: 5px 12px;
     border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid var(--border);
     font-size: 11px;
     font-family: var(--font-ui);
     cursor: pointer;
@@ -399,7 +424,7 @@
     background: transparent;
     color: var(--muted);
   }
-  .pill:hover { border-color: rgba(255,255,255,0.25); color: var(--paper); }
+  .pill:hover { border-color: var(--border-strong); color: var(--text); }
   .pill.active { background: var(--gold); border-color: var(--gold); color: var(--ink); font-weight: 600; }
 
   @media (max-width: 600px) {
@@ -683,6 +708,7 @@
     <button class="mode-btn" id="mode-starred" onclick="setMode('starred')">⭐ Starred</button>
   </div>
   <button class="btn primary" onclick="shuffleDeck()">🔀 Shuffle</button>
+  <button class="btn" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light mode">☀️ Light mode</button>
   <button class="btn" onclick="resetStats()">↺ Reset</button>
 </div>
 
@@ -761,6 +787,25 @@
 </div>
 
 <script>
+const THEME_KEY = 'jlpt-n2-theme';
+
+function applyTheme(theme) {
+  document.body.setAttribute('data-theme', theme);
+  const toggle = document.getElementById('theme-toggle');
+  if (toggle) {
+    toggle.textContent = theme === 'light' ? '🌙 Dark mode' : '☀️ Light mode';
+    toggle.setAttribute('aria-label', theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
+  }
+}
+
+function toggleTheme() {
+  const nextTheme = document.body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  localStorage.setItem(THEME_KEY, nextTheme);
+  applyTheme(nextTheme);
+}
+
+applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
+
 // ====== VOCABULARY DATA ======
 const vocab = [  {kanji:"得る",reading:"える",english:"to get / to gain / to understand",pos:"vt.",lesson:1},
   {kanji:"同窓会",reading:"どうそうかい",english:"class reunion",pos:"n.",lesson:1},
